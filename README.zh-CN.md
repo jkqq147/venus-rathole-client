@@ -62,6 +62,14 @@ local_addr = "127.0.0.1:80"
 
 安装后客户端默认关闭。完成配置后，在 GX 的 Rathole 页面将 `Client` 设为 `Enabled` 即可启动。rathole 负责与服务端持续重连；`Client running` 只表示本机客户端进程正在运行，不表示公网端口已经验证可访问。
 
+## 卸载
+
+```sh
+/data/venus-rathole/venus-rathole uninstall
+```
+
+该命令会移除客户端、配置、开机启动钩子和 GGCX 菜单项。
+
 ## 版本策略
 
 rathole 固定为 `v0.5.0`，并校验各架构的 SHA-256。安装脚本不会跟随可能变化的 `latest` 版本。维护者升级流程见 [维护说明](docs/MAINTENANCE.md)。

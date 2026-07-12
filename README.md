@@ -44,6 +44,14 @@ The service starts automatically after reboot. Its GX settings page shows the lo
 
 The client is disabled after a new installation. After editing `client.toml`, set `Client` to `Enabled` on the GX page. Rathole owns server reconnection; `Client running` means the local client process is running, not that a public port has been independently verified.
 
+## Uninstall
+
+```sh
+/data/venus-rathole/venus-rathole uninstall
+```
+
+This removes the client, configuration, boot hook, and GX menu entry.
+
 ## Version Policy
 
 Rathole is pinned to `v0.5.0` and checked against architecture-specific SHA-256 digests. The installer never follows a moving `latest` release. See [maintenance notes](docs/MAINTENANCE.md) for the verified update process.
