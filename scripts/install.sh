@@ -32,14 +32,20 @@ EOF
 download() {
     url="$1"
     destination="$2"
-
-    if command -v wget >/dev/null 2>&1; then
-        wget -q -O "$destination" "$url"
-    elif command -v curl >/dev/null 2>&1; then
-        curl -fsSL -o "$destination" "$url"
-    else
-        die "wget or curl is required"
-    fi
+    attempt=1
+    while [ "$attempt" -le 3 ]; do
+        if command -v wget >/dev/null 2>&1; then
+            wget -q -T 45 -t 1 -O "$destination" "$url" && return 0
+        elif command -v curl >/dev/null 2>&1; then
+            curl -fsSL --connect-timeout 30 -o "$destination" "$url" && return 0
+        else
+            die "wget or curl is required"
+        fi
+        rm -f "$destination"
+        [ "$attempt" -eq 3 ] || { printf '%s\n' "Download failed; retrying ($attempt/3)..." >&2; sleep 5; }
+        attempt=$((attempt + 1))
+    done
+    die "could not download $url"
 }
 
 verify_sha256() {
