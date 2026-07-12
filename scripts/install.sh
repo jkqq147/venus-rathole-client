@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-RATHOLE_VERSION="${RATHOLE_VERSION:-v0.5.0}"
+RATHOLE_VERSION="v0.5.0"
 BASE_DIR="${VENUS_RATHOLE_BASE_DIR:-/data/venus-rathole}"
 RC_LOCAL="${VENUS_RATHOLE_RC_LOCAL:-/data/rc.local}"
 SERVICE_ROOT="${VENUS_RATHOLE_SERVICE_ROOT:-/service}"

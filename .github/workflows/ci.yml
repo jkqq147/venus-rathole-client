@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate shell scripts
+        run: |
+          sh -n install.sh scripts/*.sh
+          shellcheck install.sh scripts/*.sh
+      - name: Validate Python service
+        run: python3 -m py_compile service/rathole-manager.py
+      - name: Check pinned release policy
+        run: |
+          grep -q '^RATHOLE_VERSION="v[0-9]' scripts/install.sh
+          ! grep -q 'RATHOLE_VERSION:-' scripts/install.sh
+

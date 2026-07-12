@@ -30,6 +30,10 @@ The service starts automatically after reboot. Its GX settings page shows the lo
 
 The client is disabled after a new installation. After editing `client.toml`, set `Client` to `Enabled` on the GX page. Rathole owns server reconnection; `Client running` means the local client process is running, not that a public port has been independently verified.
 
+## Version Policy
+
+Rathole is pinned to `v0.5.0` and checked against architecture-specific SHA-256 digests. The installer never follows a moving `latest` release. See [maintenance notes](docs/MAINTENANCE.md) for the verified update process.
+
 ## Server configuration
 
 Configure the server independently. A minimal server-side example is in [docs/server-example.toml](docs/server-example.toml). The client only needs the server address, service name, token, and local target such as `127.0.0.1:22`.
