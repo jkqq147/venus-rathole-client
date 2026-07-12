@@ -27,7 +27,7 @@ scp venus-rathole-client-v0.1.1-armv7.tar.gz root@GX_IP:/tmp/
 ssh root@GX_IP 'cd /tmp && tar -xzf venus-rathole-client-v0.1.1-armv7.tar.gz && sh venus-rathole-client-v0.1.1-armv7/offline-install.sh'
 ```
 
-脚本会下载指定版本的官方 rathole 二进制、校验 SHA-256、安装到 `/data/venus-rathole`，生成短设备令牌和可编辑的配置模板。安装完成后立即生效，不需要重启。
+仓库安装包已包含固定版本的官方 rathole 二进制。脚本会校验 SHA-256、安装到 `/data/venus-rathole`，并生成短设备令牌和可编辑的配置模板。安装完成后立即生效，不需要重启。
 
 然后编辑配置：
 

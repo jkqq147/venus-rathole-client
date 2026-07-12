@@ -176,6 +176,8 @@ mkdir -p "$BASE_DIR/bin" "$BASE_DIR/scripts" "$BASE_DIR/service"
 if [ -n "${RATHOLE_ARCHIVE:-}" ]; then
     [ -r "$RATHOLE_ARCHIVE" ] || die "RATHOLE_ARCHIVE is not readable"
     cp "$RATHOLE_ARCHIVE" "$temporary"
+elif [ -r "$SCRIPT_DIR/../vendor/$RATHOLE_ASSET" ]; then
+    cp "$SCRIPT_DIR/../vendor/$RATHOLE_ASSET" "$temporary"
 else
     download "https://github.com/rathole-org/rathole/releases/download/$RATHOLE_VERSION/$RATHOLE_ASSET" "$temporary"
 fi

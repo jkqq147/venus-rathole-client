@@ -31,7 +31,7 @@ download() {
 
 trap cleanup EXIT INT TERM
 mkdir -p "$WORKDIR"
-download "https://github.com/$REPOSITORY/archive/refs/heads/$REF.zip" "$ARCHIVE"
+download "https://codeload.github.com/$REPOSITORY/zip/refs/heads/$REF" "$ARCHIVE"
 
 command -v unzip >/dev/null 2>&1 || die "unzip is required"
 unzip -q "$ARCHIVE" -d "$WORKDIR"

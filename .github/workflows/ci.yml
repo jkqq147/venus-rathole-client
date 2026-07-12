@@ -12,7 +12,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Validate shell scripts
         run: |
           sh -n install.sh scripts/*.sh
@@ -24,3 +24,6 @@ jobs:
           grep -q '^RATHOLE_VERSION="v[0-9]' scripts/rathole-release.sh
           ! grep -q 'RATHOLE_VERSION:-' scripts/rathole-release.sh
           grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$' VERSION
+          . ./scripts/rathole-release.sh
+          select_rathole_release armv7
+          echo "$RATHOLE_SHA256  vendor/$RATHOLE_ASSET" | sha256sum -c -

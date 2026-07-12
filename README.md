@@ -28,7 +28,7 @@ scp venus-rathole-client-v0.1.1-armv7.tar.gz root@GX_IP:/tmp/
 ssh root@GX_IP 'cd /tmp && tar -xzf venus-rathole-client-v0.1.1-armv7.tar.gz && sh venus-rathole-client-v0.1.1-armv7/offline-install.sh'
 ```
 
-The installer downloads the pinned upstream rathole release, verifies its SHA-256 checksum, installs it under `/data/venus-rathole`, creates a short device token and editable configuration template, and installs a native GX settings page. No reboot is required.
+The repository package includes the pinned upstream rathole binary. The installer verifies its SHA-256 checksum, installs it under `/data/venus-rathole`, creates a short device token and editable configuration template, and installs a native GX settings page. No reboot is required.
 
 Then edit the rathole-native configuration with `nano /data/venus-rathole/client.toml`. Use one device token for all local targets on that GX; each target needs its own service name and server-side public port.
 
