@@ -3,9 +3,13 @@
 [server]
 bind_addr = "0.0.0.0:2333"
 
-# Create one service for each GX device. Keep every token unique.
-[server.services.gx-boat-01]
-token = "replace-with-a-long-random-token"
+# Create one service for each local target. Targets on the same GX share a token.
+[server.services.gx-boat-01-ssh]
+token = "A1B2C3D4"
 bind_addr = "0.0.0.0:22201"
 
-# Connect to server.example.com:22201 to reach this GX device's SSH port.
+[server.services.gx-boat-01-web]
+token = "A1B2C3D4"
+bind_addr = "0.0.0.0:28080"
+
+# Connect to server.example.com:22201 for SSH, or :28080 for the web target.

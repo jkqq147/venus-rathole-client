@@ -11,7 +11,7 @@ MARKER_END="# END venus-rathole"
 GUI_DIR="${VENUS_RATHOLE_GUI_DIR:-/opt/victronenergy/gui/qml}"
 PAGE_MAIN="$GUI_DIR/PageMain.qml"
 PAGE_RATHOLE="$GUI_DIR/PageRathole.qml"
-CONFIGURE_AFTER_INSTALL=1
+CREATED_TOKEN=""
 
 die() {
     printf '%s\n' "Error: $*" >&2
@@ -20,10 +20,9 @@ die() {
 
 usage() {
     cat <<'EOF'
-Usage: install.sh [--no-configure]
+Usage: install.sh
 
-Installs the Venus OS rathole client. --no-configure installs the service
-without asking for server details.
+Installs the Venus OS rathole client and creates an editable client.toml template.
 EOF
 }
 
@@ -52,6 +51,30 @@ verify_sha256() {
     fi
 
     [ "$actual" = "$expected" ] || die "rathole download checksum did not match"
+}
+
+generate_token() {
+    [ -r /dev/urandom ] || die "/dev/urandom is required to generate a token"
+    token=$(od -An -N 4 -tx1 /dev/urandom | tr -d ' \n' | tr '[:lower:]' '[:upper:]')
+    [ "${#token}" -eq 8 ] || die "could not generate a token"
+    printf '%s' "$token"
+}
+
+ensure_client_template() {
+    [ -f "$BASE_DIR/client.toml" ] && return 0
+    CREATED_TOKEN=$(generate_token)
+    umask 077
+    cat > "$BASE_DIR/client.toml" <<EOF
+# Edit this file with: nano $BASE_DIR/client.toml
+[client]
+remote_addr = ""
+
+# Use the same device token for every target on this GX.
+[client.services.gx-ssh]
+token = "$CREATED_TOKEN"
+local_addr = "127.0.0.1:22"
+EOF
+    chmod 600 "$BASE_DIR/client.toml"
 }
 
 install_boot_hook() {
@@ -128,8 +151,7 @@ PY
 }
 
 case "${1:-}" in
-    "") ;;
-    --no-configure) CONFIGURE_AFTER_INSTALL=0 ;;
+    ""|--no-configure) ;;
     --help|-h) usage; exit 0 ;;
     *) die "unknown option: $1" ;;
 esac
@@ -162,11 +184,12 @@ chmod 700 "$BASE_DIR/bin/rathole"
 
 unset CDPATH
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-cp "$SCRIPT_DIR/configure.sh" "$BASE_DIR/scripts/configure.sh"
 cp "$SCRIPT_DIR/start-service.sh" "$BASE_DIR/scripts/start-service.sh"
 cp "$SCRIPT_DIR/uninstall.sh" "$BASE_DIR/scripts/uninstall.sh"
 cp "$SCRIPT_DIR/../service/rathole-manager.py" "$BASE_DIR/rathole-manager.py"
-chmod 700 "$BASE_DIR/scripts/configure.sh" "$BASE_DIR/scripts/start-service.sh" "$BASE_DIR/scripts/uninstall.sh" "$BASE_DIR/rathole-manager.py"
+rm -f "$BASE_DIR/scripts/configure.sh"
+chmod 700 "$BASE_DIR/scripts/start-service.sh" "$BASE_DIR/scripts/uninstall.sh" "$BASE_DIR/rathole-manager.py"
+ensure_client_template
 cat > "$BASE_DIR/service/run" <<EOF
 #!/bin/sh
 exec python3 "$BASE_DIR/rathole-manager.py" >/dev/null 2>&1
@@ -180,10 +203,9 @@ case "\${1:-status}" in
     start) sv up "$SERVICE_ROOT/$SERVICE_NAME" ;;
     stop) sv down "$SERVICE_ROOT/$SERVICE_NAME" ;;
     restart) sv restart "$SERVICE_ROOT/$SERVICE_NAME" ;;
-    configure) exec "$BASE_DIR/scripts/configure.sh" ;;
     uninstall) exec "$BASE_DIR/scripts/uninstall.sh" ;;
     *)
-        printf '%s\\n' "Usage: venus-rathole {status|start|stop|restart|configure|uninstall}" >&2
+        printf '%s\\n' "Usage: venus-rathole {status|start|stop|restart|uninstall}" >&2
         exit 1
         ;;
 esac
@@ -201,8 +223,7 @@ if [ -s "$BASE_DIR/client.toml" ] && command -v sv >/dev/null 2>&1; then
 fi
 
 printf '%s\n' "Installed rathole $RATHOLE_VERSION in $BASE_DIR."
-if [ "$CONFIGURE_AFTER_INSTALL" -eq 1 ]; then
-    "$BASE_DIR/scripts/configure.sh"
-else
-    printf '%s\n' "Configure it with: $BASE_DIR/venus-rathole configure"
+printf '%s\n' "Edit targets with: nano $BASE_DIR/client.toml"
+if [ -n "$CREATED_TOKEN" ]; then
+    printf '%s\n' "Device token: $CREATED_TOKEN"
 fi

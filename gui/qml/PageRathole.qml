@@ -26,23 +26,13 @@ MbPage {
 		}
 
 		MbItemValue {
-			description: qsTr("Device service")
-			item.bind: "com.victronenergy.rathole/ServiceName"
-		}
-
-		MbItemValue {
-			description: qsTr("Local target")
-			item.bind: "com.victronenergy.rathole/LocalAddress"
-		}
-
-		MbItemValue {
 			description: qsTr("Device token")
 			item.bind: "com.victronenergy.rathole/Token"
 		}
 
 		MbItemValue {
-			description: qsTr("Detail")
-			item.bind: "com.victronenergy.rathole/Detail"
+			description: qsTr("Targets")
+			item.bind: "com.victronenergy.rathole/TargetCount"
 		}
 	}
 }

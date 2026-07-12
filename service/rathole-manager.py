@@ -33,12 +33,13 @@ from vedbus import VeDbusService  # noqa: E402
 
 
 def read_client_config():
-    """Read display-safe client fields without exposing the service token."""
-    result = {"remote_addr": "", "service_name": "", "local_addr": "", "token": ""}
+    """Read the rathole config for status display without changing it."""
+    result = {"remote_addr": "", "token": "", "targets": []}
     if not os.path.isfile(CONFIG_FILE):
         return result
 
     service_pattern = re.compile(r"^\[client\.services\.([A-Za-z0-9_-]+)\]$")
+    current_target = None
     with open(CONFIG_FILE, "r", encoding="utf-8") as config:
         for raw_line in config:
             line = raw_line.strip()
@@ -46,11 +47,13 @@ def read_client_config():
                 result["remote_addr"] = line.split("=", 1)[1].strip().strip('"')
             match = service_pattern.match(line)
             if match:
-                result["service_name"] = match.group(1)
+                current_target = {"name": match.group(1), "local_addr": ""}
+                result["targets"].append(current_target)
             elif line.startswith("token = "):
-                result["token"] = line.split("=", 1)[1].strip().strip('"')
-            elif line.startswith("local_addr = "):
-                result["local_addr"] = line.split("=", 1)[1].strip().strip('"')
+                if not result["token"]:
+                    result["token"] = line.split("=", 1)[1].strip().strip('"')
+            elif current_target and line.startswith("local_addr = "):
+                current_target["local_addr"] = line.split("=", 1)[1].strip().strip('"')
     return result
 
 
@@ -68,10 +71,8 @@ class RatholeManager:
         self.service.add_path("/StatusText", "Starting")
         self.service.add_path("/Enabled", 1, writeable=True, onchangecallback=self._enabled_changed)
         self.service.add_path("/ServerAddress", "")
-        self.service.add_path("/ServiceName", "")
-        self.service.add_path("/LocalAddress", "")
         self.service.add_path("/Token", "")
-        self.service.add_path("/Detail", "")
+        self.service.add_path("/TargetCount", 0)
         self.service.register()
         self.settings = SettingsDevice(
             self.bus,
@@ -107,31 +108,35 @@ class RatholeManager:
             preexec_fn=os.setsid,
         )
 
-    def _publish(self, status, detail, config):
+    def _publish(self, status, config):
         self.service["/StatusText"] = status
-        self.service["/Detail"] = detail
         self.service["/ServerAddress"] = config["remote_addr"]
-        self.service["/ServiceName"] = config["service_name"]
-        self.service["/LocalAddress"] = config["local_addr"]
         self.service["/Token"] = config["token"]
+        self.service["/TargetCount"] = len(config["targets"])
         self.service["/Enabled"] = 1 if self.settings["enabled"] else 0
 
     def tick(self):
         config = read_client_config()
-        configured = all(config.values()) and os.path.isfile(RATHOLE_BIN)
+        configured = (
+            bool(config["remote_addr"])
+            and bool(config["token"])
+            and bool(config["targets"])
+            and all(target["local_addr"] for target in config["targets"])
+            and os.path.isfile(RATHOLE_BIN)
+        )
         enabled = bool(self.settings["enabled"])
 
         if not enabled:
             self._stop_process()
-            self._publish("Disabled", "Enable to start the client", config)
+            self._publish("Disabled", config)
             return True
         if not configured:
             self._stop_process()
-            self._publish("Configuration required", "Run configure from SSH", config)
+            self._publish("Configuration required", config)
             return True
 
         if self.process is not None and self.process.poll() is None:
-            self._publish("Running", "Client process is running", config)
+            self._publish("Running", config)
             return True
 
         now = time.monotonic()
@@ -143,11 +148,11 @@ class RatholeManager:
                 self._start_process()
             except OSError as error:
                 self.next_start_at = now + RESTART_DELAY_SECONDS
-                self._publish("Start failed", str(error), config)
+                self._publish("Start failed", config)
                 return True
-            self._publish("Starting", "Launching client process", config)
+            self._publish("Starting", config)
         else:
-            self._publish("Restarting", "Waiting before retry", config)
+            self._publish("Restarting", config)
         return True
 
     def stop(self):
