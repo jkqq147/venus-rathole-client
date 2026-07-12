@@ -143,9 +143,9 @@ if begin in text or end in text:
         raise SystemExit("Incomplete existing Rathole UI marker")
     text = re.sub(r"\n?\s*// BEGIN venus-rathole-ui.*?\s*// END venus-rathole-ui", "", text, count=1, flags=re.S)
 
-marker = '\t\t\tMbSubMenu {\n\t\t\t\tdescription: qsTr("Settings")'
+marker = '\t\t\tMbSubMenu {\n\t\t\t\tid: menuNotifications'
 if marker not in text:
-    raise SystemExit("Could not find the supported Settings insertion point in PageMain.qml")
+    raise SystemExit("Could not find the supported Notifications insertion point in PageMain.qml")
 path.write_text(text.replace(marker, block + "\n\n" + marker, 1))
 PY
     if command -v svc >/dev/null 2>&1 && [ -e /service/gui ]; then
