@@ -8,6 +8,9 @@ SERVICE_ROOT="${VENUS_RATHOLE_SERVICE_ROOT:-/service}"
 SERVICE_NAME="venus-rathole"
 MARKER_BEGIN="# BEGIN venus-rathole"
 MARKER_END="# END venus-rathole"
+GUI_DIR="${VENUS_RATHOLE_GUI_DIR:-/opt/victronenergy/gui/qml}"
+PAGE_MAIN="$GUI_DIR/PageMain.qml"
+PAGE_RATHOLE="$GUI_DIR/PageRathole.qml"
 CONFIGURE_AFTER_INSTALL=1
 
 die() {
@@ -87,6 +90,43 @@ EOF
     rm -f "$cleaned" "$block"
 }
 
+install_gui_page() {
+    [ -f "$PAGE_MAIN" ] || return 0
+    cp "$SCRIPT_DIR/../gui/qml/PageRathole.qml" "$PAGE_RATHOLE"
+    chmod 0644 "$PAGE_RATHOLE"
+    PAGE_MAIN="$PAGE_MAIN" python3 - <<'PY'
+import os
+import re
+from pathlib import Path
+
+path = Path(os.environ["PAGE_MAIN"])
+text = path.read_text()
+begin = "// BEGIN venus-rathole-ui"
+end = "// END venus-rathole-ui"
+block = '''\t\t\t// BEGIN venus-rathole-ui
+\t\t\tMbSubMenu {
+\t\t\t\tdescription: qsTr("Rathole")
+\t\t\t\titem: VBusItem { value: [] }
+\t\t\t\tMbTextBlock { item.bind: "com.victronenergy.rathole/StatusText"; width: 160; height: 25 }
+\t\t\t\tsubpage: Component { PageRathole {} }
+\t\t\t}
+\t\t\t// END venus-rathole-ui'''
+
+if begin in text or end in text:
+    if begin not in text or end not in text:
+        raise SystemExit("Incomplete existing Rathole UI marker")
+    text = re.sub(r"\n?\s*// BEGIN venus-rathole-ui.*?\s*// END venus-rathole-ui", "", text, count=1, flags=re.S)
+
+marker = '\t\t\tMbSubMenu {\n\t\t\t\tdescription: qsTr("Settings")'
+if marker not in text:
+    raise SystemExit("Could not find the supported Settings insertion point in PageMain.qml")
+path.write_text(text.replace(marker, block + "\n\n" + marker, 1))
+PY
+    if command -v svc >/dev/null 2>&1 && [ -e /service/gui ]; then
+        svc -t /service/gui >/dev/null 2>&1 || true
+    fi
+}
+
 case "${1:-}" in
     "") ;;
     --no-configure) CONFIGURE_AFTER_INSTALL=0 ;;
@@ -125,13 +165,11 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 cp "$SCRIPT_DIR/configure.sh" "$BASE_DIR/scripts/configure.sh"
 cp "$SCRIPT_DIR/start-service.sh" "$BASE_DIR/scripts/start-service.sh"
 cp "$SCRIPT_DIR/uninstall.sh" "$BASE_DIR/scripts/uninstall.sh"
-chmod 700 "$BASE_DIR/scripts/configure.sh" "$BASE_DIR/scripts/start-service.sh" "$BASE_DIR/scripts/uninstall.sh"
+cp "$SCRIPT_DIR/../service/rathole-manager.py" "$BASE_DIR/rathole-manager.py"
+chmod 700 "$BASE_DIR/scripts/configure.sh" "$BASE_DIR/scripts/start-service.sh" "$BASE_DIR/scripts/uninstall.sh" "$BASE_DIR/rathole-manager.py"
 cat > "$BASE_DIR/service/run" <<EOF
 #!/bin/sh
-if [ ! -s "$BASE_DIR/client.toml" ]; then
-    exec sleep 3600
-fi
-exec "$BASE_DIR/bin/rathole" --client "$BASE_DIR/client.toml" >/dev/null 2>&1
+exec python3 "$BASE_DIR/rathole-manager.py" >/dev/null 2>&1
 EOF
 chmod 700 "$BASE_DIR/service/run"
 cat > "$BASE_DIR/venus-rathole" <<EOF
@@ -154,6 +192,10 @@ chmod 700 "$BASE_DIR/venus-rathole"
 
 install_boot_hook
 "$BASE_DIR/scripts/start-service.sh"
+if ! install_gui_page; then
+    rm -f "$PAGE_RATHOLE"
+    printf '%s\n' "GX menu integration was skipped: this PageMain.qml layout is not supported." >&2
+fi
 if [ -s "$BASE_DIR/client.toml" ] && command -v sv >/dev/null 2>&1; then
     sv restart "$SERVICE_ROOT/$SERVICE_NAME" >/dev/null 2>&1 || true
 fi

@@ -14,13 +14,13 @@
 wget -qO- https://raw.githubusercontent.com/jkqq147/venus-rathole-client/master/install.sh | sh
 ```
 
-脚本会下载指定版本的官方 rathole 二进制、校验 SHA-256、安装到 `/data/venus-rathole`，然后交互填写客户端配置。安装完成后立即生效，不需要重启。
+脚本会下载指定版本的官方 rathole 二进制、校验 SHA-256、安装到 `/data/venus-rathole`，然后交互填写客户端配置；未填写令牌时会自动生成安全令牌。安装完成后立即生效，不需要重启。
 
 需要填写的仅有：
 
 - 服务端地址，例如 `tunnel.example.com:2333`
 - 此设备的服务名，例如 `gx-boat-01`
-- 服务端为该服务设置的令牌
+- 服务端令牌可留空自动生成；生成后复制一次到服务端对应设备条目
 - 本地目标地址，SSH 通常为 `127.0.0.1:22`
 
 ## 日常命令
@@ -32,7 +32,7 @@ wget -qO- https://raw.githubusercontent.com/jkqq147/venus-rathole-client/master/
 /data/venus-rathole/venus-rathole uninstall
 ```
 
-重启 GX 后服务会自动恢复。
+重启 GX 后服务会自动恢复。GX 的 Rathole 页面会显示本机进程状态、服务器、设备服务和本机目标，并可直接选择启用或停用；令牌不会显示在页面中。
 
 ## 服务端
 

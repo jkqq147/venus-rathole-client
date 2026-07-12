@@ -26,6 +26,13 @@ toml_value() {
     printf '%s' "$1" | sed 's/[\\"]/\\&/g'
 }
 
+generate_token() {
+    [ -r /dev/urandom ] || die "/dev/urandom is required to generate a token"
+    token=$(od -An -N 32 -tx1 /dev/urandom | tr -d ' \n')
+    [ "${#token}" -eq 64 ] || die "could not generate a secure token"
+    printf '%s' "$token"
+}
+
 valid_service_name() {
     case "$1" in
         *[!A-Za-z0-9_-]*|'') return 1 ;;
@@ -61,11 +68,20 @@ while :; do
     fi
     printf '%s\n' "Use only letters, numbers, _ and -." >&2
 done
-printf '%s' "Service token [leave blank to keep current]: " >&2
+if [ -n "$existing_token" ]; then
+    printf '%s' "Service token [leave blank to keep current]: " >&2
+else
+    printf '%s' "Service token [press Enter to generate]: " >&2
+fi
 token=""
 IFS= read -r token || true
 if [ -z "$token" ]; then
     token="$existing_token"
+fi
+generated_token=0
+if [ -z "$token" ]; then
+    token=$(generate_token)
+    generated_token=1
 fi
 local_addr=$(prompt "Local target address" "$default_local")
 
@@ -88,3 +104,8 @@ mv "$temporary" "$CONFIG_FILE"
 
 restart_service
 printf '%s\n' "Saved $CONFIG_FILE and restarted $SERVICE_NAME."
+if [ "$generated_token" -eq 1 ]; then
+    printf '%s\n' ""
+    printf '%s\n' "Generated device token. Add this exact value to the matching server service:"
+    printf '%s\n' "$token"
+fi
