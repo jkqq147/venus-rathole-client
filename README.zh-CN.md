@@ -16,7 +16,16 @@
 wget -qO- https://raw.githubusercontent.com/jkqq147/venus-rathole-client/master/install.sh | sh
 ```
 
-GX 无法访问 GitHub 时，使用 Release 资产或可信镜像中的对应架构离线包，见 [离线安装](docs/OFFLINE-INSTALL.md)。
+### 离线手动安装
+
+GX 无法访问 GitHub 时，在 Mac 下载[最新 Release](https://github.com/jkqq147/venus-rathole-client/releases/latest)中的 `armv7` `.tar.gz` 安装包及对应 `.tar.gz.sha256` 文件，然后直接运行：
+
+```sh
+cd ~/Downloads
+shasum -a 256 -c venus-rathole-client-v0.1.1-armv7.tar.gz.sha256
+scp venus-rathole-client-v0.1.1-armv7.tar.gz root@GX_IP:/tmp/
+ssh root@GX_IP 'cd /tmp && tar -xzf venus-rathole-client-v0.1.1-armv7.tar.gz && sh venus-rathole-client-v0.1.1-armv7/offline-install.sh'
+```
 
 脚本会下载指定版本的官方 rathole 二进制、校验 SHA-256、安装到 `/data/venus-rathole`，生成短设备令牌和可编辑的配置模板。安装完成后立即生效，不需要重启。
 

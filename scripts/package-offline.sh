@@ -42,5 +42,5 @@ RATHOLE_ARCHIVE="\$DIR/$RATHOLE_ASSET" sh "\$DIR/scripts/install.sh"
 EOF
 chmod 755 "$STAGE/offline-install.sh"
 tar -C "$WORKDIR" -czf "$OUTPUT_DIR/$PACKAGE_NAME.tar.gz" "$PACKAGE_NAME"
-shasum -a 256 "$OUTPUT_DIR/$PACKAGE_NAME.tar.gz" > "$OUTPUT_DIR/$PACKAGE_NAME.tar.gz.sha256"
+(cd "$OUTPUT_DIR" && shasum -a 256 "$PACKAGE_NAME.tar.gz" > "$PACKAGE_NAME.tar.gz.sha256")
 printf '%s\n' "$OUTPUT_DIR/$PACKAGE_NAME.tar.gz"

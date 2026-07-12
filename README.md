@@ -16,8 +16,17 @@ SSH to the GX as `root`, then run:
 wget -qO- https://raw.githubusercontent.com/jkqq147/venus-rathole-client/master/install.sh | sh
 ```
 
-For a GX without GitHub access, use the architecture-matched offline package
-from a release asset or trusted mirror. See [offline installation](docs/OFFLINE-INSTALL.md).
+### Offline Manual Install
+
+For a GX without GitHub access, download the `armv7` `.tar.gz` package and its
+`.tar.gz.sha256` file from the [latest release](https://github.com/jkqq147/venus-rathole-client/releases/latest), then run:
+
+```sh
+cd ~/Downloads
+shasum -a 256 -c venus-rathole-client-v0.1.1-armv7.tar.gz.sha256
+scp venus-rathole-client-v0.1.1-armv7.tar.gz root@GX_IP:/tmp/
+ssh root@GX_IP 'cd /tmp && tar -xzf venus-rathole-client-v0.1.1-armv7.tar.gz && sh venus-rathole-client-v0.1.1-armv7/offline-install.sh'
+```
 
 The installer downloads the pinned upstream rathole release, verifies its SHA-256 checksum, installs it under `/data/venus-rathole`, creates a short device token and editable configuration template, and installs a native GX settings page. No reboot is required.
 
