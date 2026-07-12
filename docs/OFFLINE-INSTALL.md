@@ -8,8 +8,8 @@ current GX devices, or `aarch64` for 64-bit GX hardware. Verify the adjacent
 `.sha256` file before copying the package to the GX.
 
 ```sh
-scp venus-rathole-client-v0.5.0-armv7.tar.gz root@GX_IP:/tmp/
-ssh root@GX_IP 'cd /tmp && tar -xzf venus-rathole-client-v0.5.0-armv7.tar.gz && sh venus-rathole-client-v0.5.0-armv7/offline-install.sh'
+scp venus-rathole-client-v0.1.0-armv7.tar.gz root@GX_IP:/tmp/
+ssh root@GX_IP 'cd /tmp && tar -xzf venus-rathole-client-v0.1.0-armv7.tar.gz && sh venus-rathole-client-v0.1.0-armv7/offline-install.sh'
 ```
 
 The offline installer uses the bundled, checksum-verified upstream rathole ZIP;
@@ -21,4 +21,3 @@ Maintainers create a package with:
 sh scripts/package-offline.sh armv7
 sh scripts/package-offline.sh aarch64
 ```
-

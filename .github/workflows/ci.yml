@@ -23,3 +23,4 @@ jobs:
         run: |
           grep -q '^RATHOLE_VERSION="v[0-9]' scripts/rathole-release.sh
           ! grep -q 'RATHOLE_VERSION:-' scripts/rathole-release.sh
+          grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$' VERSION

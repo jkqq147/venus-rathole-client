@@ -6,6 +6,12 @@ SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 REPO_DIR=$(CDPATH='' cd -- "$SCRIPT_DIR/.." && pwd)
 . "$SCRIPT_DIR/rathole-release.sh"
 
+PROJECT_VERSION=$(cat "$REPO_DIR/VERSION")
+case "$PROJECT_VERSION" in
+    v[0-9]*) ;;
+    *) echo "VERSION must use vMAJOR.MINOR.PATCH format" >&2; exit 1 ;;
+esac
+
 ARCH="${1:-}"
 [ -n "$ARCH" ] || { echo "Usage: package-offline.sh {armv7|aarch64} [output-dir]" >&2; exit 1; }
 OUTPUT_DIR="${2:-$REPO_DIR/dist}"
@@ -16,7 +22,7 @@ verify_sha256() {
     [ "$actual" = "$2" ] || { echo "Checksum mismatch: $1" >&2; exit 1; }
 }
 
-PACKAGE_NAME="venus-rathole-client-${RATHOLE_VERSION}-${ARCH}"
+PACKAGE_NAME="venus-rathole-client-${PROJECT_VERSION}-${ARCH}"
 WORKDIR=$(mktemp -d)
 trap 'rm -rf "$WORKDIR"' EXIT INT TERM
 STAGE="$WORKDIR/$PACKAGE_NAME"
@@ -24,7 +30,7 @@ mkdir -p "$STAGE/scripts" "$STAGE/gui" "$STAGE/service" "$OUTPUT_DIR"
 
 curl -fsSL -o "$STAGE/$RATHOLE_ASSET" "https://github.com/rathole-org/rathole/releases/download/$RATHOLE_VERSION/$RATHOLE_ASSET"
 verify_sha256 "$STAGE/$RATHOLE_ASSET" "$RATHOLE_SHA256"
-cp "$REPO_DIR/install.sh" "$REPO_DIR/LICENSE" "$REPO_DIR/README.md" "$REPO_DIR/README.zh-CN.md" "$STAGE/"
+cp "$REPO_DIR/install.sh" "$REPO_DIR/LICENSE" "$REPO_DIR/README.md" "$REPO_DIR/README.zh-CN.md" "$REPO_DIR/VERSION" "$STAGE/"
 cp "$SCRIPT_DIR/install.sh" "$SCRIPT_DIR/start-service.sh" "$SCRIPT_DIR/uninstall.sh" "$SCRIPT_DIR/rathole-release.sh" "$STAGE/scripts/"
 cp -R "$REPO_DIR/gui/qml" "$STAGE/gui/"
 cp "$REPO_DIR/service/rathole-manager.py" "$STAGE/service/"
