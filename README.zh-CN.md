@@ -14,6 +14,8 @@
 wget -qO- https://raw.githubusercontent.com/jkqq147/venus-rathole-client/master/install.sh | sh
 ```
 
+GX 无法访问 GitHub 时，使用 Release 资产或可信镜像中的对应架构离线包，见 [离线安装](docs/OFFLINE-INSTALL.md)。
+
 脚本会下载指定版本的官方 rathole 二进制、校验 SHA-256、安装到 `/data/venus-rathole`，生成短设备令牌和可编辑的配置模板。安装完成后立即生效，不需要重启。
 
 然后编辑配置：

@@ -14,6 +14,9 @@ SSH to the GX as `root`, then run:
 wget -qO- https://raw.githubusercontent.com/jkqq147/venus-rathole-client/master/install.sh | sh
 ```
 
+For a GX without GitHub access, use the architecture-matched offline package
+from a release asset or trusted mirror. See [offline installation](docs/OFFLINE-INSTALL.md).
+
 The installer downloads the pinned upstream rathole release, verifies its SHA-256 checksum, installs it under `/data/venus-rathole`, creates a short device token and editable configuration template, and installs a native GX settings page. No reboot is required.
 
 Then edit the rathole-native configuration with `nano /data/venus-rathole/client.toml`. Use one device token for all local targets on that GX; each target needs its own service name and server-side public port.

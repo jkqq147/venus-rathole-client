@@ -16,11 +16,10 @@ jobs:
       - name: Validate shell scripts
         run: |
           sh -n install.sh scripts/*.sh
-          shellcheck install.sh scripts/*.sh
+          shellcheck -x install.sh scripts/*.sh
       - name: Validate Python service
         run: python3 -m py_compile service/rathole-manager.py
       - name: Check pinned release policy
         run: |
-          grep -q '^RATHOLE_VERSION="v[0-9]' scripts/install.sh
-          ! grep -q 'RATHOLE_VERSION:-' scripts/install.sh
-
+          grep -q '^RATHOLE_VERSION="v[0-9]' scripts/rathole-release.sh
+          ! grep -q 'RATHOLE_VERSION:-' scripts/rathole-release.sh

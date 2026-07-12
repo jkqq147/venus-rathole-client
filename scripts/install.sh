@@ -1,7 +1,7 @@
 #!/bin/sh
+# shellcheck source=scripts/rathole-release.sh
 set -eu
 
-RATHOLE_VERSION="v0.5.0"
 BASE_DIR="${VENUS_RATHOLE_BASE_DIR:-/data/venus-rathole}"
 RC_LOCAL="${VENUS_RATHOLE_RC_LOCAL:-/data/rc.local}"
 SERVICE_ROOT="${VENUS_RATHOLE_SERVICE_ROOT:-/service}"
@@ -12,6 +12,9 @@ GUI_DIR="${VENUS_RATHOLE_GUI_DIR:-/opt/victronenergy/gui/qml}"
 PAGE_MAIN="$GUI_DIR/PageMain.qml"
 PAGE_RATHOLE="$GUI_DIR/PageRathole.qml"
 CREATED_TOKEN=""
+unset CDPATH
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+. "$SCRIPT_DIR/rathole-release.sh"
 
 die() {
     printf '%s\n' "Error: $*" >&2
@@ -162,14 +165,8 @@ esac
 command -v unzip >/dev/null 2>&1 || die "unzip is required"
 
 case "$(uname -m)" in
-    armv7l|armv7*)
-        asset="rathole-armv7-unknown-linux-musleabihf.zip"
-        checksum="e8662d80d2cc9acc5f8f4d8a1c1a5ff7717b2fa71919a405d0eed8b64c8c1d88"
-        ;;
-    aarch64|arm64)
-        asset="rathole-aarch64-unknown-linux-musl.zip"
-        checksum="fa4a6fc63d86f8f1faa7c103a845e4715ce79a048455c0eec897b27237576564"
-        ;;
+    armv7l|armv7*) select_rathole_release armv7 ;;
+    aarch64|arm64) select_rathole_release aarch64 ;;
     *) die "unsupported Venus OS architecture: $(uname -m)" ;;
 esac
 
@@ -177,18 +174,22 @@ temporary="${TMPDIR:-/tmp}/rathole-$SERVICE_NAME-$$.zip"
 trap 'rm -f "$temporary"' EXIT INT TERM
 mkdir -p "$BASE_DIR/bin" "$BASE_DIR/scripts" "$BASE_DIR/service"
 
-download "https://github.com/rathole-org/rathole/releases/download/$RATHOLE_VERSION/$asset" "$temporary"
-verify_sha256 "$temporary" "$checksum"
+if [ -n "${RATHOLE_ARCHIVE:-}" ]; then
+    [ -r "$RATHOLE_ARCHIVE" ] || die "RATHOLE_ARCHIVE is not readable"
+    cp "$RATHOLE_ARCHIVE" "$temporary"
+else
+    download "https://github.com/rathole-org/rathole/releases/download/$RATHOLE_VERSION/$RATHOLE_ASSET" "$temporary"
+fi
+verify_sha256 "$temporary" "$RATHOLE_SHA256"
 unzip -p "$temporary" rathole > "$BASE_DIR/bin/rathole"
 chmod 700 "$BASE_DIR/bin/rathole"
 
-unset CDPATH
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 cp "$SCRIPT_DIR/start-service.sh" "$BASE_DIR/scripts/start-service.sh"
 cp "$SCRIPT_DIR/uninstall.sh" "$BASE_DIR/scripts/uninstall.sh"
+cp "$SCRIPT_DIR/rathole-release.sh" "$BASE_DIR/scripts/rathole-release.sh"
 cp "$SCRIPT_DIR/../service/rathole-manager.py" "$BASE_DIR/rathole-manager.py"
 rm -f "$BASE_DIR/scripts/configure.sh"
-chmod 700 "$BASE_DIR/scripts/start-service.sh" "$BASE_DIR/scripts/uninstall.sh" "$BASE_DIR/rathole-manager.py"
+chmod 700 "$BASE_DIR/scripts/start-service.sh" "$BASE_DIR/scripts/uninstall.sh" "$BASE_DIR/scripts/rathole-release.sh" "$BASE_DIR/rathole-manager.py"
 ensure_client_template
 cat > "$BASE_DIR/service/run" <<EOF
 #!/bin/sh

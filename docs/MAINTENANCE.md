@@ -16,6 +16,9 @@ To update rathole:
 4. Run the repository validation commands and test the installer on a Venus GX
    before publishing the update.
 
+Create the `armv7` and `aarch64` offline packages with
+`scripts/package-offline.sh` and publish the resulting `dist/` files as release
+assets, not source-repository files.
+
 Users update by rerunning the normal installation command. They do not need to
 choose an upstream version or override a version environment variable.
-
