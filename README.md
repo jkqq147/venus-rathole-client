@@ -58,6 +58,13 @@ Rathole is pinned to `v0.5.0` and checked against architecture-specific SHA-256 
 
 ## Server configuration
 
-Configure the server independently. A minimal server-side example is in [docs/server-example.toml](docs/server-example.toml). The client only needs the server address, service name, token, and local target such as `127.0.0.1:22`.
+The GX client needs a public rathole server before it can connect. Follow the
+[Ubuntu server setup](docs/SERVER-SETUP.md) for the verified x86_64 + systemd
+path. It installs the pinned rathole version, creates a server service, and
+shows the required firewall and GX configuration.
+
+Each GX target has a matching server-side service name and token. The server
+binds the public port; the GX configuration supplies the local target. A compact
+multi-target template is available in [docs/server-example.toml](docs/server-example.toml).
 
 This wrapper is MIT-licensed. Rathole is downloaded unchanged from its upstream release and is licensed under Apache-2.0.
