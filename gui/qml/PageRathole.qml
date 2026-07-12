@@ -36,9 +36,13 @@ MbPage {
 		}
 
 		MbItemValue {
+			description: qsTr("Device token")
+			item.bind: "com.victronenergy.rathole/Token"
+		}
+
+		MbItemValue {
 			description: qsTr("Detail")
 			item.bind: "com.victronenergy.rathole/Detail"
 		}
 	}
 }
-

@@ -34,7 +34,7 @@ from vedbus import VeDbusService  # noqa: E402
 
 def read_client_config():
     """Read display-safe client fields without exposing the service token."""
-    result = {"remote_addr": "", "service_name": "", "local_addr": ""}
+    result = {"remote_addr": "", "service_name": "", "local_addr": "", "token": ""}
     if not os.path.isfile(CONFIG_FILE):
         return result
 
@@ -47,6 +47,8 @@ def read_client_config():
             match = service_pattern.match(line)
             if match:
                 result["service_name"] = match.group(1)
+            elif line.startswith("token = "):
+                result["token"] = line.split("=", 1)[1].strip().strip('"')
             elif line.startswith("local_addr = "):
                 result["local_addr"] = line.split("=", 1)[1].strip().strip('"')
     return result
@@ -68,6 +70,7 @@ class RatholeManager:
         self.service.add_path("/ServerAddress", "")
         self.service.add_path("/ServiceName", "")
         self.service.add_path("/LocalAddress", "")
+        self.service.add_path("/Token", "")
         self.service.add_path("/Detail", "")
         self.service.register()
         self.settings = SettingsDevice(
@@ -110,6 +113,7 @@ class RatholeManager:
         self.service["/ServerAddress"] = config["remote_addr"]
         self.service["/ServiceName"] = config["service_name"]
         self.service["/LocalAddress"] = config["local_addr"]
+        self.service["/Token"] = config["token"]
         self.service["/Enabled"] = 1 if self.settings["enabled"] else 0
 
     def tick(self):

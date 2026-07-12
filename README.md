@@ -14,7 +14,7 @@ SSH to the GX as `root`, then run:
 wget -qO- https://raw.githubusercontent.com/jkqq147/venus-rathole-client/master/install.sh | sh
 ```
 
-The installer downloads the pinned upstream rathole release, verifies its SHA-256 checksum, installs it under `/data/venus-rathole`, generates a token when one is not supplied, and installs a native GX settings page. No reboot is required.
+The installer downloads the pinned upstream rathole release, verifies its SHA-256 checksum, installs it under `/data/venus-rathole`, generates a short device token when one is not supplied, and installs a native GX settings page. No reboot is required.
 
 ## Everyday commands
 
@@ -25,7 +25,7 @@ The installer downloads the pinned upstream rathole release, verifies its SHA-25
 /data/venus-rathole/venus-rathole uninstall
 ```
 
-The service starts automatically after reboot. Its GX settings page shows the local process status, server, device service, and local target; it also provides an Enabled/Disabled control. Tokens are never shown in GX.
+The service starts automatically after reboot. Its GX settings page shows the local process status, server, device service, local target, and device token; it also provides an Enabled/Disabled control.
 
 ## Server configuration
 
