@@ -4,6 +4,8 @@
 
 Install [rathole](https://github.com/rathole-org/rathole) as a persistent, client-only reverse-tunnel service on Victron Venus OS.
 
+**Supported platform:** CCGX / `armv7l`, validated on Venus OS `v3.55`. Other Venus hardware is not supported until it has been tested.
+
 The repository owns only the GX client. You keep control of the rathole server, public ports, and device access policy. One GX can expose multiple local targets with one short device token.
 
 ## Install

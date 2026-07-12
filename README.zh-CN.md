@@ -4,6 +4,8 @@
 
 在 Victron Venus OS 上安装持久运行的 [rathole](https://github.com/rathole-org/rathole) 客户端，用于内网穿透。
 
+**当前支持平台：** CCGX / `armv7l`，已在 Venus OS `v3.55` 验证。其他 Venus 硬件在完成实机验证前不支持。
+
 本项目只管理 GX 设备端。服务端地址、公网端口和访问控制全部由你自己的 rathole 服务端决定。一台 GX 可暴露多个本机服务，并且它们共用一个短设备令牌。
 
 ## 安装

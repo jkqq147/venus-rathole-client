@@ -166,8 +166,7 @@ command -v unzip >/dev/null 2>&1 || die "unzip is required"
 
 case "$(uname -m)" in
     armv7l|armv7*) select_rathole_release armv7 ;;
-    aarch64|arm64) select_rathole_release aarch64 ;;
-    *) die "unsupported Venus OS architecture: $(uname -m)" ;;
+    *) die "unsupported architecture: $(uname -m); only validated armv7 Venus OS is supported" ;;
 esac
 
 temporary="${TMPDIR:-/tmp}/rathole-$SERVICE_NAME-$$.zip"

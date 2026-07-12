@@ -13,7 +13,7 @@ case "$PROJECT_VERSION" in
 esac
 
 ARCH="${1:-}"
-[ -n "$ARCH" ] || { echo "Usage: package-offline.sh {armv7|aarch64} [output-dir]" >&2; exit 1; }
+[ -n "$ARCH" ] || { echo "Usage: package-offline.sh armv7 [output-dir]" >&2; exit 1; }
 OUTPUT_DIR="${2:-$REPO_DIR/dist}"
 select_rathole_release "$ARCH" || { echo "Unsupported architecture: $ARCH" >&2; exit 1; }
 

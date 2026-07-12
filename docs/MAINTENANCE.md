@@ -9,16 +9,14 @@ upstream `latest` label at install time.
 To update rathole:
 
 1. Select a tagged upstream release.
-2. Download the `armv7-unknown-linux-musleabihf` and
-   `aarch64-unknown-linux-musl` ZIP assets from that release.
-3. Calculate their SHA-256 digests and update `scripts/install.sh` in the same
+2. Download the `armv7-unknown-linux-musleabihf` ZIP asset from that release.
+3. Calculate its SHA-256 digest and update `scripts/rathole-release.sh` in the same
    commit as `RATHOLE_VERSION`.
 4. Run the repository validation commands and test the installer on a Venus GX
    before publishing the update.
 
-Create the `armv7` and `aarch64` offline packages with
-`scripts/package-offline.sh` and publish the resulting `dist/` files as release
-assets, not source-repository files.
+Create the validated `armv7` offline package with `scripts/package-offline.sh`
+and publish the resulting `dist/` files as release assets, not source-repository files.
 
 Users update by rerunning the normal installation command. They do not need to
 choose an upstream version or override a version environment variable.
