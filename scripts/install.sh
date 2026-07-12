@@ -151,7 +151,7 @@ PY
 }
 
 case "${1:-}" in
-    ""|--no-configure) ;;
+    "") ;;
     --help|-h) usage; exit 0 ;;
     *) die "unknown option: $1" ;;
 esac

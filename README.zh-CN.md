@@ -47,6 +47,8 @@ local_addr = "127.0.0.1:80"
 
 保存 `client.toml` 后运行 `restart`。重启 GX 后服务会自动恢复。GX 的 Rathole 页面会显示本机进程状态、服务器、设备令牌和 target 数量，并可直接选择启用或停用。
 
+安装后客户端默认关闭。完成配置后，在 GX 的 Rathole 页面将 `Client` 设为 `Enabled` 即可启动。rathole 负责与服务端持续重连；`Client running` 只表示本机客户端进程正在运行，不表示公网端口已经验证可访问。
+
 ## 服务端
 
 服务端由你自行部署和管理。可参考 [docs/server-example.toml](docs/server-example.toml)：服务端为每个 target 定义服务名和公网监听端口；同一 GX 的 target 复用一个设备令牌。

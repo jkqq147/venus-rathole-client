@@ -28,6 +28,8 @@ Then edit the rathole-native configuration with `nano /data/venus-rathole/client
 
 The service starts automatically after reboot. Its GX settings page shows the local process status, server, device token, and target count; it also provides an Enabled/Disabled control.
 
+The client is disabled after a new installation. After editing `client.toml`, set `Client` to `Enabled` on the GX page. Rathole owns server reconnection; `Client running` means the local client process is running, not that a public port has been independently verified.
+
 ## Server configuration
 
 Configure the server independently. A minimal server-side example is in [docs/server-example.toml](docs/server-example.toml). The client only needs the server address, service name, token, and local target such as `127.0.0.1:22`.

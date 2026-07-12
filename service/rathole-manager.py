@@ -69,14 +69,14 @@ class RatholeManager:
             firmwareversion="0.2.0", hardwareversion=None, connected=1,
         )
         self.service.add_path("/StatusText", "Starting")
-        self.service.add_path("/Enabled", 1, writeable=True, onchangecallback=self._enabled_changed)
+        self.service.add_path("/Enabled", 0, writeable=True, onchangecallback=self._enabled_changed)
         self.service.add_path("/ServerAddress", "")
         self.service.add_path("/Token", "")
         self.service.add_path("/TargetCount", 0)
         self.service.register()
         self.settings = SettingsDevice(
             self.bus,
-            {"enabled": [f"{SETTINGS_PREFIX}/Enabled", 1, 0, 1]},
+            {"enabled": [f"{SETTINGS_PREFIX}/Enabled", 0, 0, 1]},
             self._setting_changed,
             timeout=10,
         )
@@ -136,7 +136,7 @@ class RatholeManager:
             return True
 
         if self.process is not None and self.process.poll() is None:
-            self._publish("Running", config)
+            self._publish("Client running", config)
             return True
 
         now = time.monotonic()
@@ -150,9 +150,9 @@ class RatholeManager:
                 self.next_start_at = now + RESTART_DELAY_SECONDS
                 self._publish("Start failed", config)
                 return True
-            self._publish("Starting", config)
+            self._publish("Starting client", config)
         else:
-            self._publish("Restarting", config)
+            self._publish("Restarting client", config)
         return True
 
     def stop(self):
