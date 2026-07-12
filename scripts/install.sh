@@ -55,7 +55,7 @@ verify_sha256() {
 
 generate_token() {
     [ -r /dev/urandom ] || die "/dev/urandom is required to generate a token"
-    token=$(od -An -N 4 -tx1 /dev/urandom | tr -d ' \n' | tr '[:lower:]' '[:upper:]')
+    token=$(hexdump -n 4 -v -e '/1 "%02X"' /dev/urandom)
     [ "${#token}" -eq 8 ] || die "could not generate a token"
     printf '%s' "$token"
 }
